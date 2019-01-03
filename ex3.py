@@ -12,7 +12,7 @@ def get_articles_from_file(filename): # from ex2
         elif articleContent != "":
             articles.append(articleContent)
             article = ""
-    
+
     articles.append(article)
     return articles
 
@@ -26,16 +26,20 @@ def get_all_words_in_articles(articles): # from ex2
     return words
 
 
-def initialize_EM(articles):
-    clusteredArticlesArray = []
+def split_articles_to_clusters(articles):
+    clustered_articles_array = []
 
-    for i in range(NUM_OF_CLUSTERS): # init clusters array
-        clusteredArticlesArray.append([])
+    for i in range(NUM_OF_CLUSTERS):  # init clusters array
+        clustered_articles_array.append([])
 
-    for i, article in enumerate(articles): # split articles to clusters
-        clusteredArticlesArray[i % NUM_OF_CLUSTERS].append(article)
+    for i, article in enumerate(articles):  # split articles to clusters
+        clustered_articles_array[i % NUM_OF_CLUSTERS].append(article)
 
-    return clusteredArticlesArray
+    return clustered_articles_array
+
+
+def M_Step():
+    
 
 
 if __name__ == "__main__":
@@ -46,15 +50,5 @@ if __name__ == "__main__":
     developmentArticles = get_articles_from_file(development_set_filename)
     development_set_words = get_all_words_in_articles(developmentArticles)
 
-    initClusteredArticles = initialize_EM(developmentArticles)
-    print(len(developmentArticles))
-    print(len(initClusteredArticles))
-    print(len(initClusteredArticles[0]))
-    print(len(initClusteredArticles[1]))
-    print(len(initClusteredArticles[2]))
-    print(len(initClusteredArticles[3]))
-    print(len(initClusteredArticles[4]))
-    print(len(initClusteredArticles[5]))
-    print(len(initClusteredArticles[6]))
-    print(len(initClusteredArticles[7]))
-    print(len(initClusteredArticles[8]))
+    initClusteredArticles = split_articles_to_clusters(developmentArticles)
+    alpha,
