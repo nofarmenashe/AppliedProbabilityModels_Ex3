@@ -146,21 +146,33 @@ def get_articles_lengths_from_counters(articlesCounters):
 
 
 def E_step(alpha, P, numOfArticles, vocabulary, articlesCounters):
-    updated_Ws = np.zeros(numOfArticles, NUM_OF_CLUSTERS)
+    updated_Ws = np.zeros(numOfArticles)
     for t in range(numOfArticles):
-        for i in range(NUM_OF_CLUSTERS):
-            updated_Ws[t][i] = alpha[i] * np.product([
-                np.power(P[i][k], articlesCounters[t][k])
-                for k in vocabulary])
-        sumOfClustersProbabilities = np.sum(w[t])
-        updated_Ws[t] = [w_t_i / sumOfClustersProbabilities for w_t_i in w[t]]
+       updated_Ws[t] = calculate_w_t(t, alpha, P, articlesCounters, vocabulary)
     return updated_Ws
+
+
+def calculate_w_t(t, alpha, P, articlesCounters, vocabulary):
+    wt = np.zeros(NUM_OF_CLUSTERS)
+
+    for i in range(NUM_OF_CLUSTERS):
+        wt[i] = calculate_z_i(t, i )
+    sumOfClustersProbabilities = np.sum(w[t])
+
+    wt = [w_t_i / sumOfClustersProbabilities for w_t_i in wt]
+    return wt
+
+
+def claculate_z_i():
+    sumOf np.sum([
+        np.power(P[i][k], articlesCounters[t][k])
+        for k in vocabulary])
 
 
 if __name__ == "__main__":
     # development_set_filename = sys.argv[1]
     #
-    # NUM_OF_CLUSTERS = 9
+    NUM_OF_CLUSTERS = 9
     #
     # developmentArticles = get_articles_from_file(development_set_filename)
     # numOfArticles = len(developmentArticles)
@@ -209,10 +221,6 @@ if __name__ == "__main__":
     vocabulary = wordsCounter.keys()
 
     print(articlesLengths)
-
-
-
-
 
     w, alpha, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
 
