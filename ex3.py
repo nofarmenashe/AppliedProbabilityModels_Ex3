@@ -1,6 +1,18 @@
 import sys
 import collections
 import numpy as np
+import pickle
+
+
+def save_to_file(dict, filename):
+    with open(filename, 'wb') as handle:
+        pickle.dump(dict, handle)
+
+
+def read_from_file(filename):
+    with open(filename, 'rb') as handle:
+        obj = pickle.loads(handle.read())
+    return obj
 
 
 def get_articles_from_file(filename):  # from ex2
@@ -146,26 +158,61 @@ def E_step(alpha, P, numOfArticles, vocabulary, articlesCounters):
 
 
 if __name__ == "__main__":
-    development_set_filename = sys.argv[1]
+    # development_set_filename = sys.argv[1]
+    #
+    # NUM_OF_CLUSTERS = 9
+    #
+    # developmentArticles = get_articles_from_file(development_set_filename)
+    # numOfArticles = len(developmentArticles)
+    #
+    # developmentWords = get_all_words_in_articles(developmentArticles)
+    #
+    # wordsCounter = collections.Counter(developmentWords)
+    # rareWords = get_rare_words(wordsCounter)
+    #
+    # wordsCounter = remove_rare_words(wordsCounter)
+    #
+    # articlesCounters = [collections.Counter(get_all_words_in_articles([article])) for article in developmentArticles]
+    # articlesCounters = remove_rare_words_from_articles_counters(rareWords, articlesCounters)
+    #
+    # articlesLengths = get_articles_lengths_from_counters(articlesCounters)
+    #
+    # vocabulary = wordsCounter.keys()
+    #
+    # w, alphas, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
+    #
+    # save_to_file(w, "w.txt")
+    # save_to_file(alphas, "alphas.txt")
+    # save_to_file(P, "P.txt")
+    # # save_to_file(vocabulary, "vocabulary.txt")
+    # save_to_file(articlesLengths, "articlesLengths.txt")
+    # save_to_file(articlesCounters, "articlesCounters.txt")
+    # save_to_file(wordsCounter, "wordsCounter.txt")
+    # save_to_file(rareWords, "rareWords.txt")
+    # save_to_file(developmentWords, "developmentWords.txt")
+    # save_to_file(developmentArticles, "developmentArticles.txt")
+    # save_to_file(numOfArticles, "numOfArticles.txt")
 
-    NUM_OF_CLUSTERS = 9
 
-    developmentArticles = get_articles_from_file(development_set_filename)
-    numOfArticles = len(developmentArticles)
+    w = read_from_file("w.txt")
+    alphas = read_from_file("alphas.txt")
+    P = read_from_file("P.txt")
+    # vocabulary = read_from_file("vocabulary.txt")
 
-    developmentWords = get_all_words_in_articles(developmentArticles)
-
-    wordsCounter = collections.Counter(developmentWords)
-    rareWords = get_rare_words(wordsCounter)
-
-    wordsCounter = remove_rare_words(wordsCounter)
-
-    articlesCounters = [collections.Counter(get_all_words_in_articles([article])) for article in developmentArticles]
-    articlesCounters = remove_rare_words_from_articles_counters(rareWords, articlesCounters)
-
-    articlesLengths = get_articles_lengths_from_counters(articlesCounters)
-
+    articlesLengths = read_from_file("articlesLengths.txt")
+    articlesCounters = read_from_file("articlesCounters.txt")
+    wordsCounter = read_from_file("wordsCounter.txt")
+    rareWords = read_from_file("rareWords.txt")
+    developmentWords = read_from_file("developmentWords.txt")
+    developmentArticles = read_from_file("developmentArticles.txt")
+    numOfArticles = read_from_file("numOfArticles.txt")
     vocabulary = wordsCounter.keys()
+
+    print(articlesLengths)
+
+
+
+
 
     w, alpha, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
 
