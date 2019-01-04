@@ -1,6 +1,7 @@
 import sys
 import collections
 import numpy as np
+import math
 import pickle
 
 
@@ -67,12 +68,12 @@ def calculate_alpha_i(w, i, numOfArticles):
     for t in range(numOfArticles):
         sumOfWs += w[t][i]
 
-    return float(sumOfWs) / numOfArticles
+    alpha = float(sumOfWs) / numOfArticles
 
+    if alpha == 0:
+        return EPSILON
+    return alpha
 
-# remove rares from articles
-# calculate articles_lengths
-# S-L-E-E-P !-!-!
 
 def calculate_n_s(articles):
     articlesCounters = []
@@ -84,7 +85,7 @@ def calculate_n_s(articles):
     return articlesCounters
 
 
-def calculate_p_i_k(w, i, k, articles_lengths, articlesCounters):
+def calculate_p_i_k(w, i, k, articles_lengths, articlesCounters, vocabularySize):
     enumerator_sum = 0
     denumerator_sum = 0
 
@@ -92,13 +93,13 @@ def calculate_p_i_k(w, i, k, articles_lengths, articlesCounters):
         enumerator_sum += w[t][i] * articlesCounters[t][k]
         denumerator_sum += w[t][i] * articles_lengths[t]
 
-    return float(enumerator_sum) / denumerator_sum
+    return (float(enumerator_sum) + LAMBDA) / (denumerator_sum + (vocabularySize * LAMBDA))
 
 
 def calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary):
     P_is = {}
     for k in vocabulary:
-        P_is[k] = calculate_p_i_k(w, i, k, articlesLengths, articlesCounters)
+        P_is[k] = calculate_p_i_k(w, i, k, articlesLengths, articlesCounters, len(vocabulary))
 
     return P_is
 
@@ -106,7 +107,6 @@ def calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary):
 def initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary):
     w = []
     P = []
-    n = []
     alphas = np.zeros(NUM_OF_CLUSTERS)
 
     for t in range(numOfArticles):
@@ -119,10 +119,6 @@ def initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, v
         P.append(calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary))
 
     return w, alphas, P
-
-
-# def M_Step(cluster):
-# not implemented
 
 
 def remove_rare_words_from_articles_counters(rare_words, articlesCounters):
@@ -145,34 +141,87 @@ def get_articles_lengths_from_counters(articlesCounters):
     return articlesLengths
 
 
-def E_step(alpha, P, numOfArticles, vocabulary, articlesCounters):
-    updated_Ws = np.zeros(numOfArticles)
+def E_step(alphas, P, numOfArticles, vocabulary, articlesCounters):
+    updated_Ws = []
     for t in range(numOfArticles):
-       updated_Ws[t] = calculate_w_t(t, alpha, P, articlesCounters, vocabulary)
+       updated_Ws.append(calculate_w_t(t, alphas, P, articlesCounters, vocabulary))
     return updated_Ws
 
 
-def calculate_w_t(t, alpha, P, articlesCounters, vocabulary):
+def calculate_w_t(t, alphas, P, articlesCounters, vocabulary):
     wt = np.zeros(NUM_OF_CLUSTERS)
+    z_is = []
 
     for i in range(NUM_OF_CLUSTERS):
-        wt[i] = calculate_z_i(t, i )
-    sumOfClustersProbabilities = np.sum(w[t])
+        z_is.append(calculate_z_i(i, t, alphas, P, vocabulary, articlesCounters))
+    m = max(z_is)
 
-    wt = [w_t_i / sumOfClustersProbabilities for w_t_i in wt]
+    exponents = np.zeros(NUM_OF_CLUSTERS)
+    for i in range(NUM_OF_CLUSTERS):
+        if z_is[i] - m >= -1 * K:
+            exponents[i] = math.exp(z_is[i] - m)
+
+    denumerator = sum(exponents)
+
+    for i in range(NUM_OF_CLUSTERS):
+        if z_is[i] - m < -1 * K:
+            wt[i] = 0
+        else:
+            wt[i] = exponents[i] / denumerator
+
     return wt
 
 
-def claculate_z_i():
-    sumOf np.sum([
-        np.power(P[i][k], articlesCounters[t][k])
-        for k in vocabulary])
+def calculate_z_i(i, t, alphas, P, vocabulary, articlesCounters):
+    sum = 0
+    for k in vocabulary:
+        sum += articlesCounters[t][k] * np.log(P[i][k])
+
+    return np.log(alphas[i]) + sum
+
+
+def M_step(w, vocabulary, numOfArticles, articlesLengths, articlesCounters):
+    alphas = np.zeros(NUM_OF_CLUSTERS)
+    P = []
+
+    for i in range(NUM_OF_CLUSTERS):
+        alphas[i] = calculate_alpha_i(w, i, numOfArticles)
+        P.append(calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary))
+
+    sumOfAlphas = sum(alphas)
+    normalizedAlphas = [alpha_i / sumOfAlphas for alpha_i in alphas]
+
+    return normalizedAlphas, P
+
+
+def calculate_likelihood(alphas, P, vocabulary, articlesCounters, numOfArticles):
+    articlesLikelihood = np.zeros(numOfArticles)
+
+    for t in range(numOfArticles):
+        z_is = []
+        for i in range(NUM_OF_CLUSTERS):
+            z_is.append(calculate_z_i(i, t, alphas, P, vocabulary, articlesCounters))
+
+        m_t = max(z_is)
+
+        exponents = np.zeros(NUM_OF_CLUSTERS)
+        for i in range(NUM_OF_CLUSTERS):
+            if z_is[i] - m_t >= -1 * K:
+                exponents[i] = math.exp(z_is[i] - m_t)
+
+        articlesLikelihood[t] = m_t + math.log(sum(exponents))
+
+        return sum(articlesLikelihood)
 
 
 if __name__ == "__main__":
-    # development_set_filename = sys.argv[1]
-    #
     NUM_OF_CLUSTERS = 9
+    LAMBDA = 0.05
+    EPSILON = 0.001
+    K = 10
+    STOP_CRITERIA = 10
+
+    # development_set_filename = sys.argv[1]
     #
     # developmentArticles = get_articles_from_file(development_set_filename)
     # numOfArticles = len(developmentArticles)
@@ -209,8 +258,6 @@ if __name__ == "__main__":
     w = read_from_file("w.txt")
     alphas = read_from_file("alphas.txt")
     P = read_from_file("P.txt")
-    # vocabulary = read_from_file("vocabulary.txt")
-
     articlesLengths = read_from_file("articlesLengths.txt")
     articlesCounters = read_from_file("articlesCounters.txt")
     wordsCounter = read_from_file("wordsCounter.txt")
@@ -220,10 +267,23 @@ if __name__ == "__main__":
     numOfArticles = read_from_file("numOfArticles.txt")
     vocabulary = wordsCounter.keys()
 
-    print(articlesLengths)
+    logLikelihoodArray = []
 
-    w, alpha, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
+    while True:  # change to threshold
+        print("epoch #" + str((len(logLikelihoodArray) + 1)))
 
-    while (True):  # change to threshhold
-        w = E_step(alpha, P, numOfArticles, vocabulary, articlesCounters)
-        # alpha, P = M_step(w, articlesCounters)
+        if len(logLikelihoodArray) > 3 and logLikelihoodArray[-1] - logLikelihoodArray[-3] < STOP_CRITERIA:
+            print("Stop algorithm !")
+            break
+
+        w = E_step(alphas, P, numOfArticles, vocabulary, articlesCounters)
+        print("done e step")
+
+        alpha, P = M_step(w, vocabulary, numOfArticles, articlesLengths, articlesCounters)
+        print("done m step")
+
+        logLikelihood = calculate_likelihood(alphas, P, vocabulary, articlesCounters, numOfArticles)
+        print(logLikelihood)
+
+        logLikelihoodArray.append(logLikelihood)
+
