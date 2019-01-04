@@ -71,38 +71,39 @@ def calculate_n_s(articles):
     return articlesCounters
 
 
-def calculate_p_i_k(w, i, k, articles_lengths, numOfArticles, n_s):
+def calculate_p_i_k(w, i, k, articles_lengths, articlesCounters):
     enumerator_sum = 0
     denumerator_sum = 0
 
-    for t in range(numOfArticles):
-        enumerator_sum += w[t][i] * n_s[t][k]
+    for t in range(len(articles_lengths)):
+        enumerator_sum += w[t][i] * articlesCounters[t][k]
         denumerator_sum += w[t][i] * articles_lengths[t]
 
-    return float(enumerator_sum)/ denumerator_sum
+    return float(enumerator_sum)/denumerator_sum
 
 
-def calculate_p_i(w, i, vocabulary, articles_lengths, numOfArticles, n_s):
-    P_i = []
+def calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary):
+    P_is = {}
     for k in vocabulary:
-        P_i[k] = calculate_p_i_k(w, i, k, articles_lengths, numOfArticles, n_s)
+        P_is[k] = calculate_p_i_k(w, i, k, articlesLengths, articlesCounters)
 
-    return P_i
+    return P_is
 
 
-def initialize_EM_parameters(articles, vocabulary):
+def initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary):
     w = []
+    P = []
     n = []
     alphas = np.zeros(NUM_OF_CLUSTERS)
 
-    for t, article in enumerate(articles):
+    for t in range(numOfArticles):
        i = t % NUM_OF_CLUSTERS
-       w[t] = np.zeros(NUM_OF_CLUSTERS)
+       w.append(np.zeros(NUM_OF_CLUSTERS))
        w[t][i] = 1
 
     for i in range(NUM_OF_CLUSTERS):
-        alphas[i] = calculate_alpha_i(w, i, len(articles))
-        P[i] = calculate_p_i(w, i, vocabulary, articles_lengths, numOfArticles, n_s)
+        alphas[i] = calculate_alpha_i(w, i, numOfArticles)
+        P.append(calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary))
 
     return w, alphas, P
 
@@ -121,22 +122,35 @@ def remove_rare_words_from_articles_counters(rare_words, articlesCounters):
 
     return articlesCountersWithoutRares
 
+
+def get_articles_lengths_from_counters(articlesCounters):
+    articlesLengths = []
+    for articleCounter in articlesCounters:
+        articlesLengths.append(sum(articleCounter.values()))
+
+    return articlesLengths
+
+
 if __name__ == "__main__":
     development_set_filename = sys.argv[1]
 
     NUM_OF_CLUSTERS = 9
 
     developmentArticles = get_articles_from_file(development_set_filename)
-    development_set_words = get_all_words_in_articles(developmentArticles)
+    numOfArticles = len(developmentArticles)
 
-    wordsCounter = collections.Counter(development_set_words)
-    wordsCounter = remove_rare_words(wordsCounter)
+    developmentWords = get_all_words_in_articles(developmentArticles)
 
+    wordsCounter = collections.Counter(developmentWords)
     rareWords = get_rare_words(wordsCounter)
+
+    wordsCounter = remove_rare_words(wordsCounter)
 
     articlesCounters = [collections.Counter(get_all_words_in_articles([article])) for article in developmentArticles]
     articlesCounters = remove_rare_words_from_articles_counters(rareWords, articlesCounters)
 
+    articlesLengths = get_articles_lengths_from_counters(articlesCounters)
+
     vocabulary = wordsCounter.keys()
 
-    w, alpha, P = initialize_EM_parameters(developmentArticles, vocabulary)
+    w, alpha, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
