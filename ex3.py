@@ -54,6 +54,7 @@ def get_rare_words(wordsDictionary):
 
     return rareWords
 
+
 def remove_rare_words(wordsDictionary):
     return {w: wordsDictionary[w] for w
             in wordsDictionary
@@ -91,7 +92,7 @@ def calculate_p_i_k(w, i, k, articles_lengths, articlesCounters):
         enumerator_sum += w[t][i] * articlesCounters[t][k]
         denumerator_sum += w[t][i] * articles_lengths[t]
 
-    return float(enumerator_sum)/denumerator_sum
+    return float(enumerator_sum) / denumerator_sum
 
 
 def calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary):
@@ -109,15 +110,16 @@ def initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, v
     alphas = np.zeros(NUM_OF_CLUSTERS)
 
     for t in range(numOfArticles):
-       i = t % NUM_OF_CLUSTERS
-       w.append(np.zeros(NUM_OF_CLUSTERS))
-       w[t][i] = 1
+        i = t % NUM_OF_CLUSTERS
+        w.append(np.zeros(NUM_OF_CLUSTERS))
+        w[t][i] = 1
 
     for i in range(NUM_OF_CLUSTERS):
         alphas[i] = calculate_alpha_i(w, i, numOfArticles)
         P.append(calculate_p_is(w, i, articlesLengths, articlesCounters, vocabulary))
 
     return w, alphas, P
+
 
 # def M_Step(cluster):
 # not implemented
@@ -143,10 +145,34 @@ def get_articles_lengths_from_counters(articlesCounters):
     return articlesLengths
 
 
+def E_step(alpha, P, numOfArticles, vocabulary, articlesCounters):
+    updated_Ws = np.zeros(numOfArticles)
+    for t in range(numOfArticles):
+       updated_Ws[t] = calculate_w_t(t, alpha, P, articlesCounters, vocabulary)
+    return updated_Ws
+
+
+def calculate_w_t(t, alpha, P, articlesCounters, vocabulary):
+    wt = np.zeros(NUM_OF_CLUSTERS)
+
+    for i in range(NUM_OF_CLUSTERS):
+        wt[i] = calculate_z_i(t, i )
+    sumOfClustersProbabilities = np.sum(w[t])
+
+    wt = [w_t_i / sumOfClustersProbabilities for w_t_i in wt]
+    return wt
+
+
+def claculate_z_i():
+    sumOf np.sum([
+        np.power(P[i][k], articlesCounters[t][k])
+        for k in vocabulary])
+
+
 if __name__ == "__main__":
     # development_set_filename = sys.argv[1]
     #
-    # NUM_OF_CLUSTERS = 9
+    NUM_OF_CLUSTERS = 9
     #
     # developmentArticles = get_articles_from_file(development_set_filename)
     # numOfArticles = len(developmentArticles)
@@ -196,6 +222,8 @@ if __name__ == "__main__":
 
     print(articlesLengths)
 
+    w, alpha, P = initialize_EM_parameters(numOfArticles, articlesLengths, articlesCounters, vocabulary)
 
-
-
+    while (True):  # change to threshhold
+        w = E_step(alpha, P, numOfArticles, vocabulary, articlesCounters)
+        # alpha, P = M_step(w, articlesCounters)
