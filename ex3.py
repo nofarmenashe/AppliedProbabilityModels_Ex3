@@ -33,11 +33,19 @@ def get_w_of_article(article):
     return remove_rare_words(wordsDict)
 
 
+def get_rare_words(wordsDictionary):
+    rareWords = []
+
+    for word in wordsDictionary:
+        if wordsDictionary[word] <= 3:
+            rareWords.append(word)
+
+    return rareWords
+
 def remove_rare_words(wordsDictionary):
     return {w: wordsDictionary[w] for w
             in wordsDictionary
-            if wordsDictionary[w] > 4}
-
+            if wordsDictionary[w] >= 4}
 
 
 def calculate_alpha_i(w, i, numOfArticles):
@@ -51,8 +59,16 @@ def calculate_alpha_i(w, i, numOfArticles):
 
 # remove rares from articles
 # calculate articles_lengths
-# calculate n_s
 # S-L-E-E-P !-!-!
+
+def calculate_n_s(articles):
+    articlesCounters = []
+
+    for index, article in enumerate(articles):
+        article_words = article.split()
+        articlesCounters[index] = collections.Counter(article_words)
+
+    return articlesCounters
 
 
 def calculate_p_i_k(w, i, k, articles_lengths, numOfArticles, n_s):
@@ -66,7 +82,15 @@ def calculate_p_i_k(w, i, k, articles_lengths, numOfArticles, n_s):
     return float(enumerator_sum)/ denumerator_sum
 
 
-def initialize_EM_parameters(articles):
+def calculate_p_i(w, i, vocabulary, articles_lengths, numOfArticles, n_s):
+    P_i = []
+    for k in vocabulary:
+        P_i[k] = calculate_p_i_k(w, i, k, articles_lengths, numOfArticles, n_s)
+
+    return P_i
+
+
+def initialize_EM_parameters(articles, vocabulary):
     w = []
     n = []
     alphas = np.zeros(NUM_OF_CLUSTERS)
@@ -78,10 +102,24 @@ def initialize_EM_parameters(articles):
 
     for i in range(NUM_OF_CLUSTERS):
         alphas[i] = calculate_alpha_i(w, i, len(articles))
+        P[i] = calculate_p_i(w, i, vocabulary, articles_lengths, numOfArticles, n_s)
+
+    return w, alphas, P
 
 # def M_Step(cluster):
 # not implemented
 
+
+def remove_rare_words_from_articles_counters(rare_words, articlesCounters):
+    articlesCountersWithoutRares = []
+
+    for articleCounter in articlesCounters:
+        for word in rare_words:
+            del articleCounter[word]
+
+        articlesCountersWithoutRares.append(articleCounter)
+
+    return articlesCountersWithoutRares
 
 if __name__ == "__main__":
     development_set_filename = sys.argv[1]
@@ -91,7 +129,14 @@ if __name__ == "__main__":
     developmentArticles = get_articles_from_file(development_set_filename)
     development_set_words = get_all_words_in_articles(developmentArticles)
 
-    wordsAccuracyDictionary = collections.Counter(development_set_words)
-    wordsAccuracyDictionary = remove_rare_words(wordsAccuracyDictionary)
+    wordsCounter = collections.Counter(development_set_words)
+    wordsCounter = remove_rare_words(wordsCounter)
 
-    w, alpha, P = initialize_EM_parameters(developmentArticles)
+    rareWords = get_rare_words(wordsCounter)
+
+    articlesCounters = [collections.Counter(get_all_words_in_articles([article])) for article in developmentArticles]
+    articlesCounters = remove_rare_words_from_articles_counters(rareWords, articlesCounters)
+
+    vocabulary = wordsCounter.keys()
+
+    w, alpha, P = initialize_EM_parameters(developmentArticles, vocabulary)
