@@ -9,7 +9,7 @@ NUM_OF_CLUSTERS = 9
 LAMBDA = 0.05
 EPSILON = 0.001
 K = 10
-STOP_CRITERIA = 10
+STOP_CRITERIA = 50
 
 
 def save_to_file(dict, filename):
@@ -82,12 +82,14 @@ class EMModel:
             z = self.get_z(article)
             m = max(z)
 
-        denominator = sum([math.exp(z[i] - m) for i in range(NUM_OF_CLUSTERS) if z[i] - m >= -K])
-        for i in range(NUM_OF_CLUSTERS):
-            if z[i] - m >= -K:
-                article.wt[i] = 0
-            else:
-                article.wt[i] = math.exp((z[i] - m) / denominator)
+            denominator = sum([math.exp(z[i] - m) for i in range(NUM_OF_CLUSTERS) if z[i] - m >= -K])
+            for i in range(NUM_OF_CLUSTERS):
+                if z[i] - m < -K:
+                    article.wt[i] = 0
+                else:
+                    article.wt[i] = math.exp(z[i] - m) / denominator
+                    print("CHANGED")
+
         print("end E step")
 
     def get_z(self, article):
@@ -113,7 +115,6 @@ class EMModel:
             Pi_process.join()
 
         self.P = dict(Ps)
-        print(self.alphas)
         print("end M step")
 
     def calculate_alpha_i(self, i):
