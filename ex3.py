@@ -1,10 +1,17 @@
+# Writen By:
+# Yuval Maymon - 315806299
+# Nofar Menashe - 205486210
+
 import sys
 import collections
 import numpy as np
 import multiprocessing
 import math
 import pickle
+
+import csv
 import matplotlib.pyplot as plt
+import pandas as pd
 
 NUM_OF_CLUSTERS = 9
 LAMBDA = 0.05
@@ -38,23 +45,31 @@ def save_results_graph(data, datatype):
     plt.plot(range(len(data)), data)
     plt.xlabel('epoch')
     plt.ylabel(datatype)
-    plt.savefig(datatype +'.png')
+    plt.savefig(datatype + '.png')
 
 
 def get_articles_from_file(filename):
     file = open(filename, "r")
     lines = file.readlines()
+
     articles = []
+    topics = []
     articleContent = ""
+
     for line in lines:
-        if line[:6] != '<TRAIN' and line[:5] != '<TEST':
+        if line[:6] == '<TRAIN':
+            if articleContent != "":
+                articles.append(articleContent)
+                articleContent = ""
+            topics.append(line.split(">")[0].split()[2:])
+
+        else:
             articleContent += line
-        elif articleContent != "":
-            articles.append(articleContent)
-            articleContent = ""
 
     articles.append(articleContent)
-    return articles
+    print(topics)
+
+    return articles, topics
 
 
 def get_all_words_in_articles(articles):
@@ -73,19 +88,19 @@ def remove_rare_words(wordsDictionary):
 
 
 class Article:
-    def __init__(self, articleIndex, articleString, vocabulary):
+    def __init__(self, articleIndex, articleString, tags, vocabulary):
         articleWords = articleString.split()
         filteredWords = [word for word in articleWords if word in vocabulary]
+
         self.articleCounter = collections.Counter(filteredWords)
         self.length = len(filteredWords)
+        self.tags = tags
 
         self.wt = np.zeros(NUM_OF_CLUSTERS)
         self.wt[articleIndex % NUM_OF_CLUSTERS] = 1
-        # add tags
-
 
 class EMModel:
-    def __init__(self, articles, vocabulary, topics):
+    def __init__(self, articles, articlesTags, vocabulary, topics):
         self.alpha = None
         self.P = None
         self.articles = []
@@ -94,7 +109,7 @@ class EMModel:
         self.vocabulary = collections.Counter(vocabulary)
 
         for t, article in enumerate(articles):
-            self.articles.append(Article(t, article, vocabulary))
+            self.articles.append(Article(t, article, articlesTags[t], vocabulary))
 
     def E_step(self):
         print("start E step")
@@ -188,12 +203,37 @@ class EMModel:
 
         return sumOfPerplexities / len(self.articles)
 
+    def create_confusion_matrix(self):
+        matrix = []
+        for i in range(NUM_OF_CLUSTERS):
+            matrix.append({topic: 0 for topic in self.topics})
+            for article in self.articles:
+                if np.argmax(article.wt) == i:
+                    print(article.tags)
+                    for tag in article.tags:
+                        matrix[i][tag] += 1
+
+        lines = [("{0},{1}".format(str(i), (",".join([str(c) for c in row.values()]))))
+                 for i, row in enumerate(matrix)]
+        lines.insert(0, "," + ",".join(self.topics))
+
+        fh = open("matrix.csv", "w")
+        fh.write("\n".join(lines))
+        fh.close()
+        # matrix = [[i+1].extend(row) for i, row in enumerate(matrix)]
+        # headers = ['index'].extend(self.topics)
+        # print(headers)
+        # with open('confusionMatrix.csv', 'w', newline='') as file:
+        #     writer = csv.DictWriter(file, fieldnames=headers)
+        #     writer.writeheader()
+        #     writer.writerows(matrix)
+
 
 if __name__ == "__main__":
     development_set_filename = sys.argv[1]
     topics_set_filename = sys.argv[2]
 
-    developmentArticles = get_articles_from_file(development_set_filename)
+    developmentArticles, developmentArticlesTopics = get_articles_from_file(development_set_filename)
     developmentWords = get_all_words_in_articles(developmentArticles)
 
     wordsCounter = collections.Counter(developmentWords)
@@ -202,14 +242,14 @@ if __name__ == "__main__":
     vocabulary = wordsCounter.keys()
 
     topics = get_words_in_file(topics_set_filename)
-    print(topics)
 
-    EM = EMModel(developmentArticles, vocabulary, topics)
+    EM = EMModel(developmentArticles, developmentArticlesTopics, vocabulary, topics)
 
     logLikelihoodArray = []
     meanPerplexityArray = []
 
     EM.M_step()
+    EM.create_confusion_matrix()
 
     while True:  # change to threshold
         print("epoch #" + str((len(logLikelihoodArray) + 1)))
@@ -228,6 +268,7 @@ if __name__ == "__main__":
         logLikelihoodArray.append(logLikelihood)
         meanPerplexityArray.append(perplexity)
 
+        EM.create_confusion_matrix()
 
     save_results_graph(logLikelihoodArray, "likelihood")
     save_results_graph(meanPerplexityArray, "preplexity")
