@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3d56d3bf-5809-48d6-8c26-a8bda074010a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.txt" beforeDir="false" afterPath="$PROJECT_DIR$/P.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ex3.py" beforeDir="false" afterPath="$PROJECT_DIR$/ex3.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -12,33 +11,47 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-944336734">
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="2068" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="2068" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ex3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="272" column="43" selection-start-line="272" selection-start-column="43" selection-end-line="272" selection-end-column="43" />
+            <state relative-caret-position="884">
+              <caret line="144" column="8" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="8" />
               <folding>
-                <element signature="e#114#184#0" />
-                <element signature="e#209#302#0" />
-                <element signature="e#105#485#0" />
-                <element signature="e#234#428#0" />
-                <element signature="e#365#428#0" />
-                <element signature="e#533#658#0" />
-                <element signature="e#581#640#0" />
-                <element signature="e#696#784#0" />
-                <element signature="e#828#975#0" />
-                <element signature="e#884#913#0" />
-                <element signature="e#1274#1380#0" />
-                <element signature="e#1281#1380#0" />
-                <element signature="e#1443#1620#0" />
-                <element signature="e#1661#1868#0" />
-                <element signature="e#1739#1839#0" />
-                <element signature="e#2615#2702#0" />
-                <element signature="e#3036#3285#0" />
-                <element signature="e#3123#3244#0" />
-                <element signature="e#3350#3503#0" />
+                <element signature="e#115#185#0" />
+                <element signature="e#222#315#0" />
+                <element signature="e#372#752#0" />
+                <element signature="e#501#695#0" />
+                <element signature="e#632#695#0" />
+                <element signature="e#806#931#0" />
+                <element signature="e#870#933#0" />
+                <element signature="e#1286#1392#0" />
+                <element signature="e#1293#1392#0" />
+                <element signature="e#5725#6025#0" />
+                <element signature="e#6141#6379#0" />
+                <element signature="e#6689#6812#0" />
+                <element signature="e#7120#7477#0" />
+                <element signature="e#7200#7379#0" />
+                <element signature="e#7460#7625#0" />
+                <element signature="e#7980#8419#0" />
+                <marker date="1546688892051" expanded="true" signature="1195:1606" ph="..." />
+                <marker date="1546688892051" expanded="true" signature="1622:1939" ph="..." />
+                <marker date="1546688892051" expanded="true" signature="2414:2423" ph="..." />
               </folding>
             </state>
           </provider>
@@ -47,7 +60,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/develop.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169240">
+            <state relative-caret-position="143854">
               <caret line="8462" column="11" selection-start-line="8462" selection-start-column="11" selection-end-line="8462" selection-end-column="11" />
             </state>
           </provider>
@@ -79,11 +92,16 @@
       <find>likelihood_t</find>
       <find>calculate_w</find>
       <find>print</find>
+      <find>calculate_z_i</find>
+      <find>LAMBDA</find>
+      <find>articleCounter.</find>
+      <find>self.alpha</find>
     </findStrings>
     <replaceStrings>
       <replace>articleContent</replace>
       <replace>developmentSetWords</replace>
       <replace>articlesLikelihood</replace>
+      <replace>self.alphas</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -103,8 +121,9 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-11" />
-    <option name="width" value="980" />
-    <option name="height" value="1031" />
+    <option name="y" value="-11" />
+    <option name="width" value="1943" />
+    <option name="height" value="1043" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -127,7 +146,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ex3_files" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -209,21 +228,20 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.14805023" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14785373" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3291815" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3291815" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39679715" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.0" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.31444758" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.37366548" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.40569395" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.3291815" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -267,31 +285,6 @@
         </entry>
       </map>
     </option>
-    <option name="RECENT_FILTERS">
-      <map>
-        <entry key="Branch">
-          <value>
-            <list>
-              <RecentGroup>
-                <option name="FILTER_VALUES">
-                  <option value="nofar" />
-                </option>
-              </RecentGroup>
-              <RecentGroup>
-                <option name="FILTER_VALUES">
-                  <option value="master" />
-                </option>
-              </RecentGroup>
-            </list>
-          </value>
-        </entry>
-        <entry key="User">
-          <value>
-            <list />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add e step" />
@@ -299,6 +292,12 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ex3.py</url>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -318,35 +317,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ex3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="272" column="43" selection-start-line="272" selection-start-column="43" selection-end-line="272" selection-end-column="43" />
+        <state relative-caret-position="884">
+          <caret line="144" column="8" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="8" />
           <folding>
-            <element signature="e#114#184#0" />
-            <element signature="e#209#302#0" />
-            <element signature="e#105#485#0" />
-            <element signature="e#234#428#0" />
-            <element signature="e#365#428#0" />
-            <element signature="e#533#658#0" />
-            <element signature="e#581#640#0" />
-            <element signature="e#696#784#0" />
-            <element signature="e#828#975#0" />
-            <element signature="e#884#913#0" />
-            <element signature="e#1274#1380#0" />
-            <element signature="e#1281#1380#0" />
-            <element signature="e#1443#1620#0" />
-            <element signature="e#1661#1868#0" />
-            <element signature="e#1739#1839#0" />
-            <element signature="e#2615#2702#0" />
-            <element signature="e#3036#3285#0" />
-            <element signature="e#3123#3244#0" />
-            <element signature="e#3350#3503#0" />
+            <element signature="e#115#185#0" />
+            <element signature="e#222#315#0" />
+            <element signature="e#372#752#0" />
+            <element signature="e#501#695#0" />
+            <element signature="e#632#695#0" />
+            <element signature="e#806#931#0" />
+            <element signature="e#870#933#0" />
+            <element signature="e#1286#1392#0" />
+            <element signature="e#1293#1392#0" />
+            <element signature="e#5725#6025#0" />
+            <element signature="e#6141#6379#0" />
+            <element signature="e#6689#6812#0" />
+            <element signature="e#7120#7477#0" />
+            <element signature="e#7200#7379#0" />
+            <element signature="e#7460#7625#0" />
+            <element signature="e#7980#8419#0" />
+            <marker date="1546688892051" expanded="true" signature="1195:1606" ph="..." />
+            <marker date="1546688892051" expanded="true" signature="1622:1939" ph="..." />
+            <marker date="1546688892051" expanded="true" signature="2414:2423" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/develop.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169240">
+        <state relative-caret-position="143854">
           <caret line="8462" column="11" selection-start-line="8462" selection-start-column="11" selection-end-line="8462" selection-end-column="11" />
         </state>
       </provider>
