@@ -4,6 +4,7 @@ import numpy as np
 import multiprocessing
 import math
 import pickle
+import matplotlib.pyplot as plt
 
 NUM_OF_CLUSTERS = 9
 LAMBDA = 0.05
@@ -23,7 +24,24 @@ def read_from_file(filename):
     return obj
 
 
-def get_articles_from_file(filename):  # from ex2
+def get_words_in_file(filename):
+    file = open(filename, "r")
+    lines = file.readlines()
+    words = []
+    for line in lines:
+        words.extend(line.split())
+    return words
+
+
+def save_results_graph(data, datatype):
+    plt.figure()
+    plt.plot(range(len(data)), data)
+    plt.xlabel('epoch')
+    plt.ylabel(datatype)
+    plt.savefig(datatype +'.png')
+
+
+def get_articles_from_file(filename):
     file = open(filename, "r")
     lines = file.readlines()
     articles = []
@@ -67,12 +85,14 @@ class Article:
 
 
 class EMModel:
-    def __init__(self, articles, vocabulary):
+    def __init__(self, articles, vocabulary, topics):
         self.alpha = None
         self.P = None
         self.articles = []
 
+        self.topics = topics
         self.vocabulary = collections.Counter(vocabulary)
+
         for t, article in enumerate(articles):
             self.articles.append(Article(t, article, vocabulary))
 
@@ -153,9 +173,25 @@ class EMModel:
 
         return sum(articlesLikelihood)
 
+    def calculate_mean_perplexity(self):
+        sumOfPerplexities = 0
+
+        for article in self.articles:
+            prediction = np.argmax(article.wt)
+            sumOfWordsProbabilities = 0
+            for k, n in article.articleCounter.items():
+                PofPerdictedCluster = (self.P[prediction][k] * article.length + LAMBDA) / \
+                                      (article.length + len(self.vocabulary) * LAMBDA)
+                sumOfWordsProbabilities += np.log(PofPerdictedCluster) * n
+
+            sumOfPerplexities += np.exp(sumOfWordsProbabilities / -article.length)
+
+        return sumOfPerplexities / len(self.articles)
+
 
 if __name__ == "__main__":
     development_set_filename = sys.argv[1]
+    topics_set_filename = sys.argv[2]
 
     developmentArticles = get_articles_from_file(development_set_filename)
     developmentWords = get_all_words_in_articles(developmentArticles)
@@ -165,9 +201,13 @@ if __name__ == "__main__":
 
     vocabulary = wordsCounter.keys()
 
-    EM = EMModel(developmentArticles, vocabulary)
+    topics = get_words_in_file(topics_set_filename)
+    print(topics)
+
+    EM = EMModel(developmentArticles, vocabulary, topics)
 
     logLikelihoodArray = []
+    meanPerplexityArray = []
 
     EM.M_step()
 
@@ -182,6 +222,12 @@ if __name__ == "__main__":
         EM.M_step()
 
         logLikelihood = EM.calculate_likelihood()
+        perplexity = EM.calculate_mean_perplexity()
         print(logLikelihood)
 
         logLikelihoodArray.append(logLikelihood)
+        meanPerplexityArray.append(perplexity)
+
+
+    save_results_graph(logLikelihoodArray, "likelihood")
+    save_results_graph(meanPerplexityArray, "preplexity")
