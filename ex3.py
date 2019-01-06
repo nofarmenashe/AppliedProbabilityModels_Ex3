@@ -11,7 +11,6 @@ import pickle
 
 import csv
 import matplotlib.pyplot as plt
-import pandas as pd
 
 NUM_OF_CLUSTERS = 9
 LAMBDA = 0.05
@@ -67,7 +66,6 @@ def get_articles_from_file(filename):
             articleContent += line
 
     articles.append(articleContent)
-    print(topics)
 
     return articles, topics
 
@@ -205,15 +203,17 @@ class EMModel:
 
     def create_confusion_matrix(self):
         matrix = []
+        counter = np.zeros(NUM_OF_CLUSTERS)
+
         for i in range(NUM_OF_CLUSTERS):
             matrix.append({topic: 0 for topic in self.topics})
             for article in self.articles:
                 if np.argmax(article.wt) == i:
-                    print(article.tags)
+                    counter[i] += 1
                     for tag in article.tags:
                         matrix[i][tag] += 1
 
-        lines = [("{0},{1}".format(str(i), (",".join([str(c) for c in row.values()]))))
+        lines = [("{0},{1},{2}".format(str(i), (",".join([str(c) for c in row.values()])), counter[i]))
                  for i, row in enumerate(matrix)]
         lines.insert(0, "," + ",".join(self.topics))
 
@@ -249,7 +249,6 @@ if __name__ == "__main__":
     meanPerplexityArray = []
 
     EM.M_step()
-    EM.create_confusion_matrix()
 
     while True:  # change to threshold
         print("epoch #" + str((len(logLikelihoodArray) + 1)))
@@ -268,7 +267,6 @@ if __name__ == "__main__":
         logLikelihoodArray.append(logLikelihood)
         meanPerplexityArray.append(perplexity)
 
-        EM.create_confusion_matrix()
-
     save_results_graph(logLikelihoodArray, "likelihood")
     save_results_graph(meanPerplexityArray, "preplexity")
+    EM.create_confusion_matrix()
